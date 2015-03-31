@@ -1,0 +1,206 @@
+C51 COMPILER V9.50a   MAIN                                                                 03/23/2015 14:45:37 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c ROM(COMPACT) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <STC12C5A60S2.H>
+   2          
+   3          void SendData(unsigned char byte);
+   4          void SendString(unsigned char *str);
+   5          
+   6          void UartInit(void);
+   7          void Timer0Init(void);
+   8          void Timer1Init(void);
+   9          
+  10          volatile unsigned char servo = 0;
+  11          volatile unsigned char PV[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  12          volatile unsigned char PT[32] = {0,0,0,0,0,0,0,0,10,15,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  13                  
+  14          void main()
+  15          {
+  16   1              P0M0 = 0xFF;            //设置所有IO口强推挽输出
+  17   1              P1M0 = 0xFF;
+  18   1              P2M0 = 0xFF;
+  19   1              P3M0 = 0xFC;
+  20   1      
+  21   1              UartInit();
+  22   1              Timer0Init();
+  23   1              Timer1Init();
+  24   1              EA = 1;
+  25   1              
+  26   1              SendString("32Servo!\r\n");
+  27   1              while(1){};
+  28   1      }
+  29          
+  30          void SendData(unsigned char byte)
+  31          {
+  32   1              SBUF = byte;   
+  33   1          while(TI == 0);   
+  34   1          TI = 0;
+  35   1      }
+  36          
+  37          void SendString(unsigned char *str)
+  38          {
+  39   1          while(*str) SendData(*str++);
+  40   1      }
+  41          
+  42          void UartInit(void)             //115200bps@11.0592MHz
+  43          {
+  44   1              PCON &= 0x7F;           //波特率不倍速
+  45   1              SCON = 0x50;            //8位数据,可变波特率
+  46   1              AUXR |= 0x04;           //独立波特率发生器时钟为Fosc,即1T
+  47   1              BRT = 0xFD;                     //设定独立波特率发生器重装值
+  48   1              AUXR |= 0x01;           //串口1选择独立波特率发生器为波特率发生器
+  49   1              AUXR |= 0x10;           //启动独立波特率发生器
+  50   1              ES = 0x01;
+  51   1      }
+  52          
+  53          void Timer0Init(void)   //20毫秒@11.0592MHz
+  54          {
+  55   1              AUXR &= 0x7F;           //定时器时钟12T模式
+C51 COMPILER V9.50a   MAIN                                                                 03/23/2015 14:45:37 PAGE 2   
+
+  56   1              TMOD &= 0xF0;           //设置定时器模式
+  57   1              TMOD |= 0x01;           //设置定时器模式
+  58   1              TL0 = 0x00;                     //设置定时初值
+  59   1              TH0 = 0xB8;                     //设置定时初值
+  60   1              TF0 = 0;                        //清除TF0标志
+  61   1              TR0 = 1;                        //定时器0开始计时
+  62   1              ET0 = 1;
+  63   1      }
+  64          
+  65          void Timer1Init(void)   //100微秒@11.0592MHz
+  66          {       
+  67   1              AUXR &= 0xBF;           //定时器时钟12T模式
+  68   1              TMOD &= 0x0F;           //设置定时器模式
+  69   1              TMOD |= 0x20;           //设置定时器模式
+  70   1              TL1 = 0xA4;                     //设置定时初值
+  71   1              TH1 = 0xA4;                     //设置定时重载值
+  72   1              TF1 = 0;                        //清除TF1标志
+  73   1              TR1 = 1;                        //定时器1开始计时
+  74   1              ET1 = 1;
+  75   1      }
+  76          
+  77          void tm0_isr() interrupt 1 using 1
+  78          {
+  79   1              TL0 = 0x00;                     //设置定时初值
+  80   1              TH0 = 0xB8;                     //设置定时初值
+  81   1      
+  82   1              PV[0] = 0;
+  83   1              PV[1] = 0;
+  84   1              PV[2] = 0;
+  85   1              PV[3] = 0;
+  86   1              PV[4] = 0;
+  87   1              PV[5] = 0;
+  88   1              PV[6] = 0;
+  89   1              PV[7] = 0;
+  90   1              PV[8] = 0;
+  91   1              PV[9] = 0;
+  92   1              PV[10] = 0;
+  93   1              PV[11] = 0;
+  94   1              PV[12] = 0;
+  95   1              PV[13] = 0;
+  96   1              PV[14] = 0;
+  97   1              PV[15] = 0;
+  98   1              PV[16] = 0;
+  99   1              PV[17] = 0;
+ 100   1              PV[18] = 0;
+ 101   1              PV[19] = 0;
+ 102   1              PV[20] = 0;
+ 103   1              PV[21] = 0;
+ 104   1              PV[22] = 0;
+ 105   1              PV[23] = 0;
+ 106   1      //      PV[24] = 0;
+ 107   1      //      PV[25] = 0;
+ 108   1              PV[26] = 0;
+ 109   1              PV[27] = 0;
+ 110   1              PV[28] = 0;
+ 111   1              PV[29] = 0;
+ 112   1              PV[30] = 0;
+ 113   1              PV[31] = 0;
+ 114   1      }
+ 115          
+ 116          void tm1_isr() interrupt 3 using 2
+ 117          {
+C51 COMPILER V9.50a   MAIN                                                                 03/23/2015 14:45:37 PAGE 3   
+
+ 118   1              P00 = (PV[0]++ >= PT[0]) ? 0 : 1;
+ 119   1              P01 = (PV[1]++ >= PT[1]) ? 0 : 1;
+ 120   1              P02 = (PV[2]++ >= PT[2]) ? 0 : 1;
+ 121   1              P03 = (PV[3]++ >= PT[3]) ? 0 : 1;
+ 122   1              P04 = (PV[4]++ >= PT[4]) ? 0 : 1;
+ 123   1              P05 = (PV[5]++ >= PT[5]) ? 0 : 1;
+ 124   1              P06 = (PV[6]++ >= PT[6]) ? 0 : 1;
+ 125   1              P07 = (PV[7]++ >= PT[7]) ? 0 : 1;
+ 126   1              
+ 127   1              P10 = (PV[8]++ >= PT[8]) ? 0 : 1;
+ 128   1              P11 = (PV[9]++ >= PT[9]) ? 0 : 1;
+ 129   1              P12 = (PV[10]++ >= PT[10]) ? 0 : 1;
+ 130   1              P13 = (PV[11]++ >= PT[11]) ? 0 : 1;
+ 131   1              P14 = (PV[12]++ >= PT[12]) ? 0 : 1;
+ 132   1              P15 = (PV[13]++ >= PT[13]) ? 0 : 1;
+ 133   1              P16 = (PV[14]++ >= PT[14]) ? 0 : 1;
+ 134   1              P17 = (PV[15]++ >= PT[15]) ? 0 : 1;
+ 135   1              
+ 136   1              P20 = (PV[16]++ >= PT[16]) ? 0 : 1;
+ 137   1              P21 = (PV[17]++ >= PT[17]) ? 0 : 1;
+ 138   1              P22 = (PV[18]++ >= PT[18]) ? 0 : 1;
+ 139   1              P23 = (PV[19]++ >= PT[19]) ? 0 : 1;
+ 140   1              P24 = (PV[20]++ >= PT[20]) ? 0 : 1;
+ 141   1              P25 = (PV[21]++ >= PT[21]) ? 0 : 1;
+ 142   1              P26 = (PV[22]++ >= PT[22]) ? 0 : 1;
+ 143   1              P27 = (PV[23]++ >= PT[23]) ? 0 : 1;
+ 144   1              
+ 145   1      //      P30 = (PV[24]++ >= PT[24]) ? 0 : 1;
+ 146   1      //      P31 = (PV[25]++ >= PT[25]) ? 0 : 1;
+ 147   1              P32 = (PV[26]++ >= PT[26]) ? 0 : 1;
+ 148   1              P33 = (PV[27]++ >= PT[27]) ? 0 : 1;
+ 149   1              P34 = (PV[28]++ >= PT[28]) ? 0 : 1;
+ 150   1              P35 = (PV[29]++ >= PT[29]) ? 0 : 1;
+ 151   1              P36 = (PV[30]++ >= PT[30]) ? 0 : 1;
+ 152   1              P37 = (PV[31]++ >= PT[31]) ? 0 : 1;
+ 153   1      }
+ 154          
+ 155          void Uart_Isr() interrupt 4 using 3
+ 156          {
+ 157   1              if(RI)   
+ 158   1          {   
+ 159   2              RI = 0;
+ 160   2                      if(SBUF&0x80)
+ 161   2                              servo = SBUF&0x1F;
+ 162   2                      else if(SBUF&0x40)
+ 163   2                      {
+ 164   3                              switch(SBUF)
+ 165   3                              {
+ 166   4                                      case 0x40: EA = 0; break;
+ 167   4                                      case 0x41: EA = 1; break;
+ 168   4                                      default: break;
+ 169   4                              }
+ 170   3                      }
+ 171   2                      //else if(SBUF&0x20){   }
+ 172   2                      else
+ 173   2                      {
+ 174   3                              PT[servo&0x1F] = SBUF;
+ 175   3                      }
+ 176   2          }   
+ 177   1      }
+
+
+C51 COMPILER V9.50a   MAIN                                                                 03/23/2015 14:45:37 PAGE 4   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    765    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     65       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
