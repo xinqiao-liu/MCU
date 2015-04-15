@@ -1,0 +1,4 @@
+"STARTUP.obj",
+"main.obj" 
+TO "STC11F02_TDisplay" 
+RAMSIZE(256) 
