@@ -1,4 +1,9 @@
 "STARTUP.obj",
-"main.obj" 
+"main.obj",
+"delay.obj",
+"ds18b20.obj",
+"uart.obj",
+"time0.obj",
+"display.obj" 
 TO "STC11F02_TDisplay" 
 RAMSIZE(256) 

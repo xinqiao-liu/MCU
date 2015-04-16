@@ -1,0 +1,60 @@
+C51 COMPILER V9.50a   UART                                                                 04/16/2015 14:34:21 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uart.c ROM(SMALL) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "uart.h"
+   2          
+   3          void UART_ISR() interrupt 4 using 2
+   4          {
+   5   1          if (RI)
+   6   1          {
+   7   2              RI = 0;             //Clear receive interrupt flag
+   8   2                      UART_SendData(SBUF);
+   9   2          }
+  10   1      }
+  11          
+  12          void UART_Init(void)    //9600bps@12.000MHz
+  13          {
+  14   1              PCON &= 0x7F;           //波特率不倍速
+  15   1              SCON = 0x50;            //8位数据,可变波特率
+  16   1              AUXR |= 0x40;           //定时器1时钟为Fosc,即1T
+  17   1              AUXR &= 0xFE;           //串口1选择定时器1为波特率发生器
+  18   1              TMOD &= 0x0F;           //清除定时器1模式位
+  19   1              TMOD |= 0x20;           //设定定时器1为8位自动重装方式
+  20   1              TL1 = 0xD9;                     //设定定时初值
+  21   1              TH1 = 0xD9;                     //设定定时器重装值
+  22   1              TR1 = 1;                        //启动定时器1
+  23   1              ES = 1;
+  24   1              EA = 1;
+  25   1      }
+  26          
+  27          void UART_SendData(unsigned char byte)
+  28          {
+  29   1              SBUF = byte;   
+  30   1          while(TI == 0);   
+  31   1          TI = 0;
+  32   1      }
+  33          
+  34          void UART_SendString(unsigned char *str)
+  35          {
+  36   1          while(*str) UART_SendData(*str++);
+  37   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    106    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
